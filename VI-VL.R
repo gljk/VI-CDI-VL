@@ -24,12 +24,12 @@ srd@data$okrug[2] <- "Beogradski"
 srd@data$area <- raster::area(srd)/1000000
 VLautomig <- VLautomig %>% arrange(-Doseljeno)
 srd$Weights<- left_join(srd@data,VLautomig %>% group_by(Okrug, Godina) %>% summarise(Weights=sum(pop*Doseljeno/100,na.rm = T)) %>% filter(Godina==1991), by=c("QNAME"="Okrug"))$Weights
-srd$Doseljeno1991<- left_join(srd@data,VLautomig %>% filter(Godina==1991)%>% group_by(Okrug) %>% summarise(Doseljeno=sum(pop*Doseljeno,na.rm = T)/sum(pop,na.rm = T),popup=paste(Opština, round(Doseljeno), collapse = "\n")) , by=c("QNAME"="Okrug"))$Doseljeno
-srd$Doseljeno2002<- left_join(srd@data,VLautomig %>% filter(Godina==2002)%>%group_by(Okrug) %>% summarise(Doseljeno=sum(pop*Doseljeno,na.rm = T)/sum(pop,na.rm = T),popup=paste(Opština, round(Doseljeno), collapse = "\n")) , by=c("QNAME"="Okrug"))$Doseljeno
-srd$Doseljeno2011<- left_join(srd@data,VLautomig %>% filter(Godina==2011)%>%group_by(Okrug) %>% summarise(Doseljeno=sum(pop*Doseljeno,na.rm = T)/sum(pop,na.rm = T), popup=paste(Opština, round(Doseljeno), collapse = "\n")) , by=c("QNAME"="Okrug"))$Doseljeno
-srd$Popup1991<- left_join(srd@data,VLautomig %>% filter(Godina==1991)%>% group_by(Okrug) %>% summarise(popup=paste(trimws(OpstinaNazivLat), round(Doseljeno,2),"%", collapse = "\n")) , by=c("QNAME"="Okrug"))$popup
-srd$Popup2002<- left_join(srd@data,VLautomig %>% filter(Godina==2002)%>%group_by(Okrug) %>% summarise(popup=paste(trimws(OpstinaNazivLat), round(Doseljeno,2),"%", collapse = "\n")) , by=c("QNAME"="Okrug"))$popup
-srd$Popup2011<- left_join(srd@data,VLautomig %>% filter(Godina==2011)%>%group_by(Okrug) %>% summarise(popup=paste(trimws(OpstinaNazivLat), round(Doseljeno,2),"%" , collapse = "\n")) , by=c("QNAME"="Okrug"))$popup
+srd$Doseljeno1991<- left_join(srd@data,VLautomig %>% filter(Godina==1991)%>% group_by(Okrug) %>% summarise(Doseljeno=sum(pop*Doseljeno,na.rm = T)/sum(pop,na.rm = T),popup=paste(Opština, round(Doseljeno,1), collapse = "\n")) , by=c("QNAME"="Okrug"))$Doseljeno
+srd$Doseljeno2002<- left_join(srd@data,VLautomig %>% filter(Godina==2002)%>%group_by(Okrug) %>% summarise(Doseljeno=sum(pop*Doseljeno,na.rm = T)/sum(pop,na.rm = T),popup=paste(Opština, round(Doseljeno,1), collapse = "\n")) , by=c("QNAME"="Okrug"))$Doseljeno
+srd$Doseljeno2011<- left_join(srd@data,VLautomig %>% filter(Godina==2011)%>%group_by(Okrug) %>% summarise(Doseljeno=sum(pop*Doseljeno,na.rm = T)/sum(pop,na.rm = T), popup=paste(Opština, round(Doseljeno,1), collapse = "\n")) , by=c("QNAME"="Okrug"))$Doseljeno
+srd$Popup1991<- left_join(srd@data,VLautomig %>% filter(Godina==1991)%>% group_by(Okrug) %>% summarise(popup=paste(trimws(OpstinaNazivLat), round(Doseljeno,1),"%", collapse = "\n")) , by=c("QNAME"="Okrug"))$popup
+srd$Popup2002<- left_join(srd@data,VLautomig %>% filter(Godina==2002)%>%group_by(Okrug) %>% summarise(popup=paste(trimws(OpstinaNazivLat), round(Doseljeno,1),"%", collapse = "\n")) , by=c("QNAME"="Okrug"))$popup
+srd$Popup2011<- left_join(srd@data,VLautomig %>% filter(Godina==2011)%>%group_by(Okrug) %>% summarise(popup=paste(trimws(OpstinaNazivLat), round(Doseljeno,1),"%" , collapse = "\n")) , by=c("QNAME"="Okrug"))$popup
 
 srd$Weights<- srd$Weights * srd@data$area 
 serb_proj <- "+proj=tmerc +lat_0=0 +lon_0=21 +k=0.9999 +x_0=7500000 +y_0=0 +ellps=bessel +towgs84=574.027,170.175,401.545,4.88786,-0.66524,-13.24673,6.89 +units=m"
@@ -52,10 +52,10 @@ plot_ly() %>%
     frame =~Godina,
     size= ~Doseljeno,
     colors="RdBu",
-    text = ~paste0(QNAME,":\n",Popup), 
+    text = ~paste0("<b>",gsub(QNAME, pattern = 'ki okrug', replacement = "ka oblast"),"</b>:\n",Popup), 
     hoverinfo = "text", 
     hoveron = "fills",   alpha=1,
     stroke=I("grey90")
   ) %>%  layout(showlegend = FALSE) %>%
-  animation_opts(frame = 100) %>% animation_button(label = "Pokreni") %>% colorbar(title="Doseljeno\nstanovništvo (%)" )
+  animation_opts(frame = 1000) %>% animation_button(label = "Pokreni") %>% colorbar(title="Doseljeno\nstanovništvo (%)" )
 
