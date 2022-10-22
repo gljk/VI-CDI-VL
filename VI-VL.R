@@ -2,6 +2,7 @@ require(openxlsx)
 require(tidyverse)
 require(plotly)
 require(cartogram)
+require(rgdal)
 
 opstine<- read.xlsx("sifarnici-mesta-opstine-okruzi-delatnosti.xlsx", sheet = "Opština")
 VLautomig<- read.csv("VL-AutoMig.csv")
@@ -44,18 +45,17 @@ a<- rbind(
   cbind(srd_ncount_sf%>% mutate(Doseljeno=Doseljeno2011, Popup=Popup2011), Godina=2011)
 )
 
-plot_ly() %>% 
+plot_ly(    colors=rev(RColorBrewer::brewer.pal("RdBu", n = 11))) %>% 
   add_sf(
     data = a, 
-    color = ~rev(Doseljeno),
+    color = ~Doseljeno,
     split = ~QNAME,
     frame =~Godina,
     size= ~Doseljeno,
-    colors="RdBu",
     text = ~paste0("<b>",gsub(QNAME, pattern = 'ki okrug', replacement = "ka oblast"),"</b>:\n",Popup), 
     hoverinfo = "text", 
     hoveron = "fills",   alpha=1,
     stroke=I("grey90")
   ) %>%  layout(showlegend = FALSE) %>%
-  animation_opts(frame = 1000) %>% animation_button(label = "Pokreni") %>% colorbar(title="Doseljeno\nstanovništvo (%)" )
+  animation_opts(frame = 1000) %>% animation_button(label = "Pokreni") %>% colorbar(title="Doseljeno\nstanovništvo (%)",direction=-1 )
 
